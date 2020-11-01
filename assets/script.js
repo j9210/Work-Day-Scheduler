@@ -13,63 +13,52 @@ var tasks = {
     "17": []
 };
 
-// create task function
-// save task local storage
-var saveTasks = function() {
+// set color of task-input based of the current time
+var setColor = function(){
+    for (i = 9; i < 18; i++){
+        if (moment().hour() < i){
+            $("#" + i).addClass("future");
+        }
+        else if (moment().hour() > i){
+            $("#" + i).addClass("past");
+        }
+        else if (moment().hour() === i){
+            $("#" + i).addClass("present");
+        }
+    }
+};
+
+// create function to save tasks
+var saveTasks = function(){
     localStorage.setItem("tasks", JSON.stringify(tasks));
     console.log("saved");
 };
-// function to load saved tasks
-var loadTasks = function() {
+
+// create function to load tasks 
+var loadTasks = function(){
     tasks = JSON.parse(localStorage.getItem("tasks"));
+    // loop over task array and show saved tasks 
+    for (i = 9; i < 18; i++){
+        $("#" + i)
+            .text(tasks[i])
+    }
+}
 
-    // if local storage is empty, create new object to track tasks
-    if (!tasks) {
-        tasks  = {
-            toDo: [],
-            inProgress: [],
-            inReview: [],
-            done: []
-        };
-    };
-// check test save
-    // loop over obj properties
-    $.each(tasks, function(hour, task) {
-        var timeBlock = $("#" + hour);
-        createTask(task, timeBlock);   
-    });
-    checkTasks();
-};
+// onclick function to save tasks
+$(".saveBtn").on("click", function(event){
+    event.preventDefault();
 
-// save task in local storage
-$(".saveBtn").on("click", function() {
-    let taskGroup = $(this).closest(".task-group");
-    let textArea = taskGroup.find("textarea");
-    let time = taskGroup.attr("id");
+    // find nearest txtare id and value to set tasks
+    let textArea = $(event.target).closest(".row").find("textarea");
+    let time = textArea.attr("id");
     let text = textArea.val().trim();
 
     tasks[time] = [text];
-    saveTasks();
-});
+    saveTasks(tasks);
+})
 
-// check tasks to update background color based on current time
-var checkTasks = function() {
-    var currentTime = moment().hour();
-    $(".task-group").each(function() {
-        var taskTime = parseInt($(this).attr("id"));
-        if (taskTime < currentTime) {
-            $(this).removeClass("present future").addClass("past");
-        } else if (taskTime === currentTime) {
-            $(this).removeClass("past future").addClass("present");
-        } else {
-            $(this).removeClass("past present").addClass("future");
-        }
-    });
-};
-
-//interval to change task background color
-setInterval(function() {
-    checkTasks();
-}, 600000);
+//call function to change colors, load every 5 min
+setColor();
+setInterval(setColor, 300000);
 
 loadTasks();
