@@ -21,10 +21,12 @@ var setColor = function(){
         }
         else if (moment().hour() > i){
             $("#" + i).addClass("past");
+            console.log("true");
         }
         else if (moment().hour() === i){
             $("#" + i).addClass("present");
         }
+
     }
 };
 
@@ -40,7 +42,7 @@ var loadTasks = function(){
     // loop over task array and show saved tasks 
     for (i = 9; i < 18; i++){
         $("#" + i)
-            .text(tasks[i])
+            .text(tasks[i]);
     }
 }
 
@@ -60,5 +62,4 @@ $(".saveBtn").on("click", function(event){
 //call function to change colors, load every 5 min
 setColor();
 setInterval(setColor, 300000);
-
 loadTasks();
